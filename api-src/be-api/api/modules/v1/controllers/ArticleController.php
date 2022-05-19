@@ -19,7 +19,15 @@ class ArticleController extends ActiveController
             'verbs' => [
                 'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
-                    'all' => ['get']
+                    'all' => ['get'],
+                    'Fetch' => ['get'],
+                    'request' => ['get'],
+                    'fetch-with-vote' => ['get'],
+                    'request-with-vote' => ['get'],
+                    'vote' => ['post'],
+                    'save' => ['post'],
+                    'edit' => ['put'],
+                    'remove' => ['delete'],
                 ]
             ]
         ];

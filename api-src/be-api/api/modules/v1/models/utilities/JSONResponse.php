@@ -13,9 +13,13 @@ class JSONResponse
     }
 
 
-    public static function generateResponse($message, $content)
+    public static function generateResponse($message, $content, $statusCode = 200)
     {
-        JSONResponse::setHeaderDataAsJson();
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+        \Yii::$app->response->statusCode = $statusCode;
+        $headers = \Yii::$app->response->headers;
+        $headers->add('Content-Type', 'application/json');
+
         return json_encode([
             'message' => $message,
             'content' => $content

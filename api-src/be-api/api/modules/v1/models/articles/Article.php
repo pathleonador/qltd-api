@@ -11,16 +11,26 @@ class Article
     public function getAllArticles()
     {
         $allArticles = (new ArticleData())->search()->asArray()->all();
-        return JSONResponse::generateResponse(null, $allArticles);
+        $responseCode = 200;
+        if (null == $allArticles) {
+            $responseCode = 404;
+        }
+        return JSONResponse::generateResponse(null, $allArticles, $responseCode);
     }
 
     public function fetchArticleById()
     {
         $id = Utility::getRequestParameterFromGetRequired('id');
-        $allArticles = (new ArticleData())->search()->andWhere([
+        $article = (new ArticleData())->search()->andWhere([
             'article_id' => $id
         ])->asArray()->one();
-        return JSONResponse::generateResponse(null, $allArticles);
+
+        $responseCode = 200;
+        if (null == $article) {
+            $responseCode = 404;
+        }
+
+        return JSONResponse::generateResponse(null, $article, $responseCode);
     }
 
     public function fetchArticleByBatch()
@@ -32,8 +42,13 @@ class Article
         $count = $allArticlesQuery->count();
         $allArticlesQuery->offset($page * $limit)->limit($limit);
         $allArticles = $allArticlesQuery->asArray()->all();
+        $responseCode = 200;
 
-        return JSONResponse::generateResponse(null, ['total_records' => $count, 'content' => $allArticles]);
+        if (null == $allArticles) {
+            $responseCode = 404;
+        }
+
+        return JSONResponse::generateResponse(null, ['total_records' => $count, 'content' => $allArticles], $responseCode);
     }
 
 
@@ -59,7 +74,15 @@ class Article
             ->andWhere([
                 'article_id' => $id
             ])->asArray()->one();
-        return JSONResponse::generateResponse(null, $allArticles);
+
+        $responseCode = 200;
+
+        if (null == $allArticles) {
+            $responseCode = 404;
+        }
+
+
+        return JSONResponse::generateResponse(null, $allArticles, $responseCode);
     }
 
     public function fetchArticleByBatchWithVote()
@@ -86,8 +109,13 @@ class Article
         $count = $allArticlesQuery->count();
         $allArticlesQuery->offset($page * $limit)->limit($limit);
         $allArticles = $allArticlesQuery->asArray()->all();
+        $responseCode = 200;
 
-        return JSONResponse::generateResponse(null, ['total_records' => $count, 'content' => $allArticles]);
+        if (null == $allArticles) {
+            $responseCode = 404;
+        }
+
+        return JSONResponse::generateResponse(null, ['total_records' => $count, 'content' => $allArticles], $responseCode);
     }
 
     public function voteForAnArticle()
@@ -95,6 +123,14 @@ class Article
         $id = Utility::getRequestParameterFromPostRequired('id');
         $vote = Utility::getRequestParameterFromPostRequired('vote');
         $userCode = Utility::getRequestParameterFromPostRequired('user_code');
+
+        $article = (new ArticleData())->search()->andWhere([
+            'article_id' => $id
+        ])->asArray()->one();
+
+        if (null == $article) {
+            return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['Article not found.']], 404);
+        }
 
         // get previous vote, include soft deleted in the result
         $previousVote = (new VoteData())->find()
@@ -144,7 +180,7 @@ class Article
             $newVote->save();
         }
 
-        return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['Record Created.']]);
+        return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['Record Created.']], 201);
     }
 
     public function createArticle()
@@ -161,7 +197,7 @@ class Article
         $article->article_updated_by = Utility::getArrayKeyValueRequired($data, 'created_by');
         $article->save();
 
-        return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['Record Created.']]);
+        return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['Record Created.']], 201);
     }
 
     public function updateArticle()
@@ -201,8 +237,8 @@ class Article
             $article->article_deleted_by = $userCode;
             $article->save();
 
-            return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['Data deeleted.']]);
+            return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['Data deeleted.']], 204);
         }
-        return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['No Record Found.']]);
+        return JSONResponse::generateResponse(null, ['total_records' => 0, 'content' => ['No Record Found.']], 404);
     }
 }
