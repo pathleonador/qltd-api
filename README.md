@@ -66,7 +66,7 @@ Using your Postman, import the api endpoints named **Articles.postman_collection
 ### Contact
 
 Patrocinio Leonador - pleonador@gmail.com  
-Project Link: https://github.com/pathleonador/dwmorgan.git
+Project Link: [https://github.com/pathleonador/qltd-api](https://github.com/pathleonador/qltd-api)
 
 ### ToDo
 
